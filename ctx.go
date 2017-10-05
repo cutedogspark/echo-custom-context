@@ -45,13 +45,20 @@ func (r *respCall) Ver(ver string) *respCall {
 	return r
 }
 
-func (r *respCall) Data(data interface{}) *dataCall {
+func (r *respCall) Data(data ...interface{}) *dataCall {
+	var d interface{}
+	if len(data) == 0 {
+		d = []string{}
+	} else {
+		d = data[0]
+	}
+
 	rs := &dataCall{
 		c:          r.c,
 		httpStatus: r.httpStatus,
 		responseParams: SuccessResp{
 			ApiVersion: r.ver,
-			Data:       data,
+			Data:       d,
 		},
 	}
 	return rs

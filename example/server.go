@@ -20,25 +20,20 @@ func main() {
 	})
 
 	e.GET("/", func(c echo.Context) error {
-		return c.(ctx.CustomCtx).Resp(http.StatusOK).Data("index").Do()
+		return c.(ctx.CustomCtx).Resp(http.StatusOK).Data("Hello, World!").Do()
 	})
 
-	e.GET("v1/success", func(c echo.Context) error {
-		return c.(ctx.CustomCtx).Resp(http.StatusOK).Ver("v1").Data([]string{}).Do()
+	e.GET("v2", func(c echo.Context) error {
+		return c.(ctx.CustomCtx).Resp(http.StatusOK).Ver("v2").Data().Do()
 	})
 
-	e.GET("v2/success", func(c echo.Context) error {
-		return c.(ctx.CustomCtx).Resp(http.StatusOK).Ver("v2").Data([]string{}).Do()
-	})
-
-	e.GET("/success", func(c echo.Context) error {
-		return c.(ctx.CustomCtx).Resp(http.StatusOK).Data([]string{}).Do()
-		//return c.(CustomCtx).Resp(http.StatusOK).Data("Hello, World!").Do()
+	e.GET("v3", func(c echo.Context) error {
+		return c.(ctx.CustomCtx).Resp(http.StatusOK).Ver("v3").Data().Do()
 	})
 
 	e.GET("/error", func(c echo.Context) error {
 		errCode := 40000001
-		errMsg := "Err Title"
+		errMsg := "Error Title"
 		errDate := ctx.NewErrors()
 		errDate.Add("Error Message 1")
 		errDate.Add("Error Message 2")
