@@ -59,7 +59,7 @@ func main() {
 
 ```json
 {
-    "apiVersion": "v2",
+    "apiVersion": "1.0",
     "data": []
 }
 ```
@@ -69,7 +69,7 @@ func main() {
 ref : https://google.github.io/styleguide/jsoncstyleguide.xml?showone=error#error
 ```json
 {
-    "apiVersion": "v1",
+    "apiVersion": "1.0",
     "error": {
         "code": 40000001,
         "message": "Err Title",
@@ -84,7 +84,7 @@ ref : https://google.github.io/styleguide/jsoncstyleguide.xml?showone=error#erro
 ##### Page Not Found
 ```json
 {
-    "apiVersion": "v1",
+    "apiVersion": "1.0",
     "error": {
     "code": 404,
         "message": "Not Found"

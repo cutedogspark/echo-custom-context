@@ -2,12 +2,13 @@ package ctx
 
 import (
 	"encoding/json"
-	"github.com/labstack/echo"
 	"strings"
+
+	"github.com/labstack/echo"
 )
 
 var (
-	apiVersion = "v1"
+	apiVersion = "1.0"
 )
 
 type CustomCtx struct {

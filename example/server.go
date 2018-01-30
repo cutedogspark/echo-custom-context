@@ -23,12 +23,12 @@ func main() {
 		return c.(ctx.CustomCtx).Resp(http.StatusOK).Data("Hello, World!").Do()
 	})
 
-	e.GET("v2", func(c echo.Context) error {
-		return c.(ctx.CustomCtx).Resp(http.StatusOK).Ver("v2").Data().Do()
+	e.GET("1.0", func(c echo.Context) error {
+		return c.(ctx.CustomCtx).Resp(http.StatusOK).Ver("1.0").Data().Do()
 	})
 
-	e.GET("v3", func(c echo.Context) error {
-		return c.(ctx.CustomCtx).Resp(http.StatusOK).Ver("v3").Data().Do()
+	e.GET("2.0", func(c echo.Context) error {
+		return c.(ctx.CustomCtx).Resp(http.StatusOK).Ver("2.0").Data().Do()
 	})
 
 	e.GET("/error", func(c echo.Context) error {
