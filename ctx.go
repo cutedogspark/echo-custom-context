@@ -89,10 +89,20 @@ type errorCall struct {
 	responseParams ErrorResponse
 }
 
+type ErrorProto struct {
+	Domain       string `json:"domain,omitempty"`
+	Reason       string `json:"reason,omitempty"`
+	Message      string `json:"message,omitempty"`
+	Location     string `json:"location,omitempty"`
+	LocationType string `json:"location_type,omitempty"`
+	ExtendedHelp string `json:"extended_help,omitempty"`
+	SendReport   string `json:"send_report,omitempty"`
+}
+
 type errorMessage struct {
-	Code    int           `json:"code"`
-	Message string        `json:"message"`
-	Errors  []interface{} `json:"errors,omitempty"`
+	Code    int          `json:"code"`
+	Message string       `json:"message"`
+	Errors  []ErrorProto `json:"errors,omitempty"`
 }
 
 type ErrorResponse struct {
@@ -119,7 +129,7 @@ func (r *errorCall) Code(code int) *errorCall {
 	return r
 }
 
-func (r *errorCall) Errors(errors []interface{}) *errorCall {
+func (r *errorCall) Errors(errors []ErrorProto) *errorCall {
 	r.responseParams.Error.Errors = errors
 	return r
 }

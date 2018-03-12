@@ -29,26 +29,33 @@ func TestCustomCtx(t *testing.T) {
 			name: "400",
 			givenHandler: func(c echo.Context) error {
 
-				errCode := 40000001
-				errMsg := "Error Title"
-				errDate := ctx.NewErrors()
-				errDate.Add("Error Message 1")
-				errDate.Add("Error Message 2")
+				var errDate []ctx.ErrorProto
 
-				return c.(ctx.CustomCtx).Resp(errCode).Error(fmt.Sprintf("%v", errMsg)).Code(errCode).Errors(errDate.Error()).Do()
+				errCode := 40000001
+
+				errDate = append(errDate, ctx.ErrorProto{
+					Domain: "Calendar",
+					Reason: "ResourceNotFoundException",
+					Message: "Resources is not exist",
+					LocationType: "database query",
+					Location: "query",
+					ExtendedHelp: "http://help-link",
+					SendReport: "http://report.dajui.com/",
+				})
+
+				errMsg := errDate[0].Message
+
+				errDate = append(errDate, ctx.ErrorProto{
+					Domain: "global",
+					Reason: "required",
+					Message: "Required parameter: part",
+					LocationType: "parameter",
+					Location: "part",
+				})
+
+				return c.(ctx.CustomCtx).Resp(errCode).Error(fmt.Sprintf("%v", errMsg)).Code(errCode).Errors(errDate).Do()
 			},
-			wantJSON: `{"apiVersion":"1.0","error":{"code":40000001,"message":"Error Title","errors":["Error Message 1","Error Message 2"]}}`,
-		},
-		{
-			name: "400 with error and errors",
-			givenHandler: func(c echo.Context) error {
-				errs := []interface{}{}
-				errs = append(errs, struct {
-					Name string `json:"name"`
-				}{"peter"})
-				return c.(ctx.CustomCtx).Resp(http.StatusOK).Error("this is error message").Errors(errs).Do()
-			},
-			wantJSON: `{"apiVersion":"1.0","error":{"code":0, "message":"this is error message", "errors":[{"name":"peter"}]}}`,
+			wantJSON: `{"apiVersion":"1.0","error":{"code":40000001,"message":"Resources is not exist","errors":[{"extended_help":"http://help-link", "send_report":"http://report.dajui.com/", "domain":"Calendar", "reason":"ResourceNotFoundException", "message":"Resources is not exist", "location":"query", "location_type":"database query"},{"message":"Required parameter: part", "location":"part", "location_type":"parameter", "domain":"global", "reason":"required"}]}}`,
 		},
 	}
 
