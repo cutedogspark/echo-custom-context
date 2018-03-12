@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/cutedogspark/echo-custom-context"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCustomCtx(t *testing.T) {
@@ -23,7 +23,7 @@ func TestCustomCtx(t *testing.T) {
 			givenHandler: func(c echo.Context) error {
 				return c.(ctx.CustomCtx).Resp(http.StatusOK).Data("hello world").Do()
 			},
-			wantJSON: `{"apiVersion": "v1", "data": "helle world"}`,
+			wantJSON: `{"apiVersion": "1.0", "data": "hello world"}`,
 		},
 		{
 			name: "400",
@@ -44,11 +44,11 @@ func TestCustomCtx(t *testing.T) {
 			givenHandler: func(c echo.Context) error {
 				errs := []interface{}{}
 				errs = append(errs, struct {
-					name string
+					Name string `json:"name"`
 				}{"peter"})
 				return c.(ctx.CustomCtx).Resp(http.StatusOK).Error("this is error message").Errors(errs).Do()
 			},
-			wantJSON: `{"apiVersion":"v1","error":{"code":0, "message":"this is error message", "errors":[{"name":"peter"}]}}`,
+			wantJSON: `{"apiVersion":"1.0","error":{"code":0, "message":"this is error message", "errors":[{"name":"peter"}]}}`,
 		},
 	}
 
@@ -66,7 +66,6 @@ func TestCustomCtx(t *testing.T) {
 				}
 			}(tc.givenHandler)(c)
 
-			t.Log(rec.Body.String())
 			assert.JSONEq(t, tc.wantJSON, rec.Body.String())
 		})
 	}
