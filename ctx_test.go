@@ -26,7 +26,39 @@ func TestCustomCtx(t *testing.T) {
 			wantJSON: `{"apiVersion": "1.0", "data": "hello world"}`,
 		},
 		{
-			name: "400",
+			name: "400 with google json style",
+			givenHandler: func(c echo.Context) error {
+
+				errCode := 40000001
+
+				errData := ctx.NewErrorProto()
+
+				errData.Add(ctx.ErrorProtoItem{
+					Domain:       "Calendar",
+					Reason:       "ResourceNotFoundException",
+					Message:      "Resources is not exist",
+					LocationType: "database query",
+					Location:     "query",
+					ExtendedHelp: "http://help-link",
+					SendReport:   "http://report.dajui.com/",
+				})
+
+				errMsg := errData.Items[0].Message
+
+				errData.Add(ctx.ErrorProtoItem{
+					Domain:       "global",
+					Reason:       "required",
+					Message:      "Required parameter: part",
+					LocationType: "parameter",
+					Location:     "part",
+				})
+
+				return c.(ctx.CustomCtx).Resp(errCode).Error(fmt.Sprintf("%v", errMsg)).Code(errCode).Errors(errData.AsErrors()).Do()
+			},
+			wantJSON: `{"apiVersion":"1.0","error":{"code":40000001,"message":"Resources is not exist","errors":[{"extended_help":"http://help-link", "send_report":"http://report.dajui.com/", "domain":"Calendar", "reason":"ResourceNotFoundException", "message":"Resources is not exist", "location":"query", "location_type":"database query"},{"message":"Required parameter: part", "location":"part", "location_type":"parameter", "domain":"global", "reason":"required"}]}}`,
+		},
+		{
+			name: "400 with string errors",
 			givenHandler: func(c echo.Context) error {
 
 				errCode := 40000001
@@ -40,7 +72,7 @@ func TestCustomCtx(t *testing.T) {
 			wantJSON: `{"apiVersion":"1.0","error":{"code":40000001,"message":"Error Title","errors":["Error Message 1","Error Message 2"]}}`,
 		},
 		{
-			name: "400 with error and errors",
+			name: "400 with custom struct",
 			givenHandler: func(c echo.Context) error {
 				errs := []interface{}{}
 				errs = append(errs, struct {
