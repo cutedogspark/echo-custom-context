@@ -2,8 +2,6 @@ package ctx
 
 import (
 	"encoding/json"
-	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/labstack/echo"
@@ -127,51 +125,6 @@ func (r *errorCall) Errors(errors []interface{}) *errorCall {
 }
 
 func (r *errorCall) Do() (err error) {
-	b, err := json.Marshal(r.responseParams)
-	if err != nil {
-		return err
-	}
-	return r.c.JSONBlob(r.httpStatus, b)
-}
-
-// Google JSON Style error call
-type gerrorCall struct {
-	c              echo.Context
-	httpStatus     int
-	responseParams GErrorResponse
-}
-
-type gerrorMessage struct {
-	Code    int      `json:"code"`
-	Message string   `json:"message"`
-	Errors  []GError `json:"errors,omitempty"`
-}
-
-type GErrorResponse struct {
-	ApiVersion string        `json:"apiVersion"`
-	Error      gerrorMessage `json:"error"`
-}
-
-func (c CustomCtx) GError(errs ...GError) *gerrorCall {
-	rs := &gerrorCall{
-		c: echo.Context(c),
-		responseParams: GErrorResponse{
-			ApiVersion: apiVersion,
-			Error:      gerrorMessage{},
-		},
-	}
-
-	if len(errs) > 0 {
-		s, _ := strconv.Atoi(fmt.Sprintf("%d", errs[0].Code)[:3])
-		rs.httpStatus = s
-		rs.responseParams.Error.Code = errs[0].Code
-		rs.responseParams.Error.Message = errs[0].Message
-		rs.responseParams.Error.Errors = errs
-	}
-	return rs
-}
-
-func (r *gerrorCall) Do() (err error) {
 	b, err := json.Marshal(r.responseParams)
 	if err != nil {
 		return err
