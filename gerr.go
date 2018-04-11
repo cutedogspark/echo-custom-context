@@ -3,7 +3,7 @@ package ctx
 type GErrors []GError
 
 type GError struct {
-	Code         int    `json:"-"`
+	Code         uint   `json:"-"`
 	Domain       string `json:"domain,omitempty"`
 	Reason       string `json:"reason,omitempty"`
 	Message      string `json:"message,omitempty"`
@@ -16,6 +16,10 @@ type GError struct {
 func (c GErrors) Append(gerr GError) GErrors {
 	c = append(c, gerr)
 	return c
+}
+
+func (c GErrors) Empty() bool {
+	return len(c) == 0
 }
 
 func NewGErrors() GErrors { return GErrors{} }

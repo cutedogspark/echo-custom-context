@@ -26,10 +26,17 @@ func TestCustomCtx(t *testing.T) {
 			wantJSON: `{"apiVersion": "1.0", "data": "hello world"}`,
 		},
 		{
+			name: "200 with google json style",
+			givenHandler: func(c echo.Context) error {
+				return c.(ctx.CustomCtx).GResp(http.StatusOK).Data("hello world").Do()
+			},
+			wantJSON: `{"apiVersion": "1.0", "data": "hello world"}`,
+		},
+		{
 			name: "400 with google json style",
 			givenHandler: func(c echo.Context) error {
 
-				gerr := ctx.NewGErrors().Append(ctx.GError{
+				gerrs := ctx.NewGErrors().Append(ctx.GError{
 					Code:         40000001,
 					Domain:       "Calendar",
 					Reason:       "ResourceNotFoundException",
@@ -47,7 +54,7 @@ func TestCustomCtx(t *testing.T) {
 					Location:     "part",
 				})
 
-				return c.(ctx.CustomCtx).GError(gerr...).Do()
+				return c.(ctx.CustomCtx).GResp().Errors(gerrs...).Do()
 			},
 			wantJSON: `{"apiVersion":"1.0","error":{"code":40000001,"message":"Resources is not exist","errors":[{"extendedHelp":"http://help-link", "sendReport":"http://report.dajui.com/", "domain":"Calendar", "reason":"ResourceNotFoundException", "message":"Resources is not exist", "location":"query", "locationType":"database query"},{"message":"Required parameter: part", "location":"part", "locationType":"parameter", "domain":"global", "reason":"required"}]}}`,
 		},
