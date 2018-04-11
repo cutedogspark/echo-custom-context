@@ -29,11 +29,8 @@ func TestCustomCtx(t *testing.T) {
 			name: "400 with google json style",
 			givenHandler: func(c echo.Context) error {
 
-				errCode := 40000001
-
-				errData := ctx.NewErrorProto()
-
-				errData.Add(ctx.ErrorProtoItem{
+				gerr := ctx.NewGErrors().Append(ctx.GError{
+					Code:         40000001,
 					Domain:       "Calendar",
 					Reason:       "ResourceNotFoundException",
 					Message:      "Resources is not exist",
@@ -41,11 +38,8 @@ func TestCustomCtx(t *testing.T) {
 					Location:     "query",
 					ExtendedHelp: "http://help-link",
 					SendReport:   "http://report.dajui.com/",
-				})
-
-				errMsg := errData.Items[0].Message
-
-				errData.Add(ctx.ErrorProtoItem{
+				}).Append(ctx.GError{
+					Code:         40000001,
 					Domain:       "global",
 					Reason:       "required",
 					Message:      "Required parameter: part",
@@ -53,9 +47,9 @@ func TestCustomCtx(t *testing.T) {
 					Location:     "part",
 				})
 
-				return c.(ctx.CustomCtx).Resp(errCode).Error(fmt.Sprintf("%v", errMsg)).Code(errCode).Errors(errData.AsErrors()).Do()
+				return c.(ctx.CustomCtx).GError(gerr...).Do()
 			},
-			wantJSON: `{"apiVersion":"1.0","error":{"code":40000001,"message":"Resources is not exist","errors":[{"extended_help":"http://help-link", "send_report":"http://report.dajui.com/", "domain":"Calendar", "reason":"ResourceNotFoundException", "message":"Resources is not exist", "location":"query", "location_type":"database query"},{"message":"Required parameter: part", "location":"part", "location_type":"parameter", "domain":"global", "reason":"required"}]}}`,
+			wantJSON: `{"apiVersion":"1.0","error":{"code":40000001,"message":"Resources is not exist","errors":[{"extendedHelp":"http://help-link", "sendReport":"http://report.dajui.com/", "domain":"Calendar", "reason":"ResourceNotFoundException", "message":"Resources is not exist", "location":"query", "locationType":"database query"},{"message":"Required parameter: part", "location":"part", "locationType":"parameter", "domain":"global", "reason":"required"}]}}`,
 		},
 		{
 			name: "400 with string errors",
