@@ -80,7 +80,7 @@ type gerrorCall struct {
 type gerrorMessage struct {
 	Code    uint     `json:"code"`
 	Message string   `json:"message"`
-	Errors  []GError `json:"errors,omitempty"`
+	Errors  []*GError `json:"errors,omitempty"`
 }
 
 type GErrorResponse struct {
@@ -88,7 +88,7 @@ type GErrorResponse struct {
 	Error      gerrorMessage `json:"error"`
 }
 
-func (r *grespCall) Errors(errs ...GError) *gerrorCall {
+func (r *grespCall) Errors(errs ...*GError) *gerrorCall {
 	rs := &gerrorCall{
 		c: r.c,
 		responseParams: GErrorResponse{
