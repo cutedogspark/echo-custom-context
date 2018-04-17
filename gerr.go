@@ -25,8 +25,22 @@ func (c *GErrors) AppendDomain(domain string) *GErrors {
 	return c
 }
 
-func (c GErrors) Empty() bool {
-	return len(c) == 0
+func (c *GErrors) Empty() bool {
+	return len(*c) == 0
+}
+
+func (c *GErrors) Code() uint {
+	if c.Empty() {
+		return 0
+	}
+	return (*c)[0].Code
+}
+
+func (c *GErrors) Message() string {
+	if c.Empty() {
+		return ""
+	}
+	return (*c)[0].Message
 }
 
 func NewGErrors() *GErrors { return &GErrors{} }
