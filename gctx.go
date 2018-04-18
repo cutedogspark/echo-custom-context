@@ -78,8 +78,8 @@ type gerrorCall struct {
 }
 
 type gerrorMessage struct {
-	Code    uint     `json:"code"`
-	Message string   `json:"message"`
+	Code    uint      `json:"code"`
+	Message string    `json:"message"`
 	Errors  []*GError `json:"errors,omitempty"`
 }
 
@@ -108,6 +108,8 @@ func (r *grespCall) Errors(errs ...*GError) *gerrorCall {
 		rs.responseParams.Error.Code = errs[0].Code
 		rs.responseParams.Error.Message = errs[0].Message
 		rs.responseParams.Error.Errors = errs
+
+		r.c.Set("gerrs", GErrors(errs))
 	}
 	return rs
 }
