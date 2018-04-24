@@ -57,7 +57,7 @@ func (r *grespCall) Data(data ...interface{}) *gdataCall {
 // Response Json Format
 // - replace string when response raw data
 // - ex: 	replace := strings.NewReplacer("{PP_KEY}", encryptionKey)
-func (r *gdataCall) Do(replace ...*strings.Replacer) (err error) {
+func (r *gdataCall) Out(replace ...*strings.Replacer) (err error) {
 	b, err := json.Marshal(r.responseParams)
 	if err != nil {
 		return err
@@ -71,53 +71,65 @@ func (r *gdataCall) Do(replace ...*strings.Replacer) (err error) {
 }
 
 // Google JSON Style error call
-type gerrorCall struct {
+type GErrCall struct {
 	c              echo.Context
-	httpStatus     int
-	responseParams GErrorResponse
+	HttpStatus     int
+	ResponseParams GErrResponse
 }
 
-type gerrorMessage struct {
+type GErrMessage struct {
 	Code    uint      `json:"code"`
 	Message string    `json:"message"`
 	Errors  []*GError `json:"errors,omitempty"`
 }
 
-type GErrorResponse struct {
-	ApiVersion string        `json:"apiVersion"`
-	Error      gerrorMessage `json:"error"`
+type GErrResponse struct {
+	ApiVersion string      `json:"apiVersion"`
+	Error      GErrMessage `json:"error"`
 }
 
-func (r *grespCall) Errors(errs ...*GError) *gerrorCall {
-	rs := &gerrorCall{
+func (r *grespCall) Errors(errs ...*GError) *GErrCall {
+	rs := &GErrCall{
 		c: r.c,
-		responseParams: GErrorResponse{
+		ResponseParams: GErrResponse{
 			ApiVersion: apiVersion,
-			Error:      gerrorMessage{},
+			Error:      GErrMessage{},
 		},
 	}
 
 	if len(errs) > 0 {
 		if len(r.httpStatus) > 0 {
-			rs.httpStatus = r.httpStatus[0]
+			rs.HttpStatus = r.httpStatus[0]
 		} else {
 			s, _ := strconv.Atoi(fmt.Sprintf("%d", errs[0].Code)[:3])
-			rs.httpStatus = s
+			rs.HttpStatus = s
 		}
 
-		rs.responseParams.Error.Code = errs[0].Code
-		rs.responseParams.Error.Message = errs[0].Message
-		rs.responseParams.Error.Errors = errs
-
-		r.c.Set("gerrs", GErrors(errs))
+		rs.ResponseParams.Error.Code = errs[0].Code
+		rs.ResponseParams.Error.Message = errs[0].Message
+		rs.ResponseParams.Error.Errors = errs
 	}
 	return rs
 }
 
-func (r *gerrorCall) Do() (err error) {
-	b, err := json.Marshal(r.responseParams)
+// Custom HTTP Error Handler
+func (r *GErrCall) Do() (err error) {
+	return r
+}
+
+// Response Json Out
+func (r *GErrCall) Out() (err error) {
+	b, err := json.Marshal(r.ResponseParams)
 	if err != nil {
 		return err
 	}
-	return r.c.JSONBlob(r.httpStatus, b)
+	return r.c.JSONBlob(r.HttpStatus, b)
+}
+
+func (r *GErrCall) Error() string {
+	b, err := json.Marshal(r.ResponseParams)
+	if err != nil {
+		return err.Error()
+	}
+	return string(b)
 }

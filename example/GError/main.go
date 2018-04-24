@@ -1,9 +1,10 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/cutedogspark/echo-custom-context"
 	"github.com/labstack/echo"
-	"net/http"
 )
 
 func main() {
@@ -18,7 +19,7 @@ func main() {
 	})
 
 	e.GET("/", func(c echo.Context) error {
-		return c.(ctx.CustomCtx).GResp(http.StatusOK).Data("Service").Do()
+		return c.(ctx.CustomCtx).GResp(http.StatusOK).Data("Service").Out()
 	})
 
 	e.GET("/error", func(c echo.Context) error {
@@ -29,7 +30,7 @@ func main() {
 			Message:      "parameter required : id",
 			Location:     "id",
 			LocationType: "parameter",
-		}).Do()
+		}).Out()
 	})
 
 	e.GET("/errors", func(c echo.Context) error {
@@ -52,10 +53,10 @@ func main() {
 
 		ctxErr.AppendDomain("handler")
 
-		return c.(ctx.CustomCtx).GResp().Errors(*ctxErr...).Do()
+		return c.(ctx.CustomCtx).GResp().Errors(*ctxErr...).Out()
 	})
 
 	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":1234"))
 
 }

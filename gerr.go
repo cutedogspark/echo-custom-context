@@ -1,9 +1,12 @@
 package ctx
 
+import "fmt"
+
 type GErrors []*GError
 
 type GError struct {
-	Code         uint   `json:"-"`
+	Code         uint   `json:"code,omitempty"`
+	Err          error  `json:"-"`
 	Domain       string `json:"domain,omitempty"`
 	Reason       string `json:"reason,omitempty"`
 	Message      string `json:"message,omitempty"`
@@ -11,6 +14,15 @@ type GError struct {
 	LocationType string `json:"locationType,omitempty"`
 	ExtendedHelp string `json:"extendedHelp,omitempty"`
 	SendReport   string `json:"sendReport,omitempty"`
+}
+
+func (g *GError) Error() string {
+	return fmt.Sprintf("%s", g.Reason)
+}
+
+func (g *GError) AppendDomain(domain string) error {
+	g.Domain = domain + "." + g.Domain
+	return g
 }
 
 func (c *GErrors) Append(gErr *GError) *GErrors {
