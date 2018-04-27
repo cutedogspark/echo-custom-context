@@ -17,7 +17,10 @@ type GError struct {
 }
 
 func (g *GError) Error() string {
-	return fmt.Sprintf("%s", g.Reason)
+	if g.Err != nil {
+		return fmt.Sprintf("%s:%s %s, Err:%s", g.Domain, g.Reason, g.Message, g.Err.Error())
+	}
+	return fmt.Sprintf("%s:%s %s", g.Domain, g.Reason, g.Message)
 }
 
 func (g *GError) AppendDomain(domain string) error {
